@@ -1,6 +1,7 @@
 import express from 'express';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
+import connectDB from "./src/config/connection.js";
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
@@ -26,9 +27,20 @@ app.use(cors());
 app.use(express.json());
 
 // Conexión a MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/chat')
-  .then(() => console.log('Conectado a MongoDB'))
-  .catch(err => console.error('Error de conexión a MongoDB:', err));
+connectDB()
+    .then(async () => {
+        server.listen(PORT, () => {
+        console.log(`Servidor corriendo en el puerto ${PORT}`);
+        });
+      })
+    .catch(() => {
+        process.exit(1); // Salir del proceso con fallo
+    });
+
+app.get('/', (req, res) => {
+  res.send('Hola Mundo!')
+})
+
 
 // Rutas
 app.use('/api/auth', authRoutes);
